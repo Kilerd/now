@@ -1,0 +1,11 @@
+[package]
+name = "now"
+version = "0.1.0"
+authors = ["Kilerd <blove694@gmail.com>"]
+edition = "2018"
+description = "a human friendly time parse lib"
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
