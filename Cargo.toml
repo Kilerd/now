@@ -8,4 +8,14 @@ license = "MIT"
 repository = "https://github.com/Kilerd/now"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[[bench]]
+name = "my_benchmark"
+harness = false
+
+
 [dependencies]
+chrono = "0.4.19"
+
+[dev-dependencies]
+criterion = "0.3"
+
