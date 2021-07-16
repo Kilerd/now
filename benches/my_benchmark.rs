@@ -9,7 +9,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         Utc::now();
     }));
     c.bench_function("utc end_of_today", |b| b.iter(|| {
-        Utc.end_of_today();
+        Utc.end_of_day();
     }));
     c.bench_function("utc end_of_today_inline", |b| b.iter(|| {
         Utc.end_of_today_inline();
