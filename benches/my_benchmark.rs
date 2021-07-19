@@ -2,7 +2,7 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 
 use chrono::Utc;
-use now::Now;
+use now::TimeZoneNow;
 
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("utc now", |b| b.iter(|| {
