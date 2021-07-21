@@ -275,8 +275,8 @@ impl<T: TimeZone> DateTimeNow for DateTime<T> {
 
 #[cfg(test)]
 mod test {
-    use chrono::Timelike;
-    use crate::TimeZoneNow;
+    use crate::{DateTimeNow, TimeZoneNow};
+    use chrono::{DateTime, Datelike, NaiveDate, TimeZone, Timelike, Utc};
 
     #[test]
     fn test_end_of_day() {
@@ -291,27 +291,11 @@ mod test {
     }
 
     #[test]
-    fn test_all() {
-        use chrono::FixedOffset;
+    fn test_leap_year() {
+        let naive_date_time = NaiveDate::from_ymd(2024, 2, 10).and_hms(0, 0, 1);
+        let date_time: DateTime<Utc> = Utc.from_local_datetime(&naive_date_time).unwrap();
+        let time = date_time.end_of_month();
 
-        use crate::TimeZoneNow;
-        let offset = FixedOffset::east(60 * 60 * 8);
-
-        dbg!(offset.now());
-        dbg!(offset.beginning_of_minute());
-        dbg!(offset.beginning_of_hour());
-        dbg!(offset.beginning_of_day());
-        dbg!(offset.beginning_of_week());
-        dbg!(offset.beginning_of_month());
-        dbg!(offset.beginning_of_quarter());
-        dbg!(offset.beginning_of_year());
-
-        dbg!(offset.end_of_minute());
-        dbg!(offset.end_of_hour());
-        dbg!(offset.end_of_day());
-        dbg!(offset.end_of_week());
-        dbg!(offset.end_of_month());
-        dbg!(offset.end_of_quarter());
-        dbg!(offset.end_of_year());
+        assert_eq!(29, time.day());
     }
 }
