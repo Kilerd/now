@@ -73,6 +73,8 @@ pub trait DateTimeNow {
     fn end_of_month(&self) -> DateTime<Self::Timezone>;
     fn end_of_quarter(&self) -> DateTime<Self::Timezone>;
     fn end_of_year(&self) -> DateTime<Self::Timezone>;
+
+    fn week_of_year(&self) -> u32;
 }
 
 impl<T> TimeZoneNow for T
@@ -344,6 +346,10 @@ impl<T: TimeZone> DateTimeNow for DateTime<T> {
             NaiveDate::from_ymd(local_date_time.year(), 12, 31).and_hms_nano(23, 59, 59, 999999999);
         self.timezone().from_local_datetime(&time5).unwrap()
     }
+
+    fn week_of_year(&self) -> u32 {
+        self.iso_week().week()
+    }
 }
 
 #[cfg(test)]
@@ -405,6 +411,20 @@ mod test {
                 .end_of_week_with_start_day(&WeekStartDay::Sunday)
                 .day()
         );
+    }
+
+    #[test]
+    fn test_week_of_year() {
+        let naive_date_time = NaiveDate::from_ymd(2012, 1, 1).and_hms(1, 0, 1);
+        let date_time: DateTime<Utc> = Utc.from_local_datetime(&naive_date_time).unwrap();
+        assert_eq!(52, date_time.week_of_year());
+
+        let naive_date_time = NaiveDate::from_ymd(2014, 12, 29).and_hms(1, 0, 1);
+        let date_time: DateTime<Utc> = Utc.from_local_datetime(&naive_date_time).unwrap();
+        assert_eq!(1, date_time.week_of_year());
+        let naive_date_time = NaiveDate::from_ymd(2021, 7, 21).and_hms(1, 0, 1);
+        let date_time: DateTime<Utc> = Utc.from_local_datetime(&naive_date_time).unwrap();
+        assert_eq!(29, date_time.week_of_year());
     }
 
     #[test]
