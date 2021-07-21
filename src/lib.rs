@@ -275,7 +275,7 @@ impl<T: TimeZone> DateTimeNow for DateTime<T> {
 
 #[cfg(test)]
 mod test {
-    use crate::{DateTimeNow};
+    use crate::DateTimeNow;
     use chrono::{DateTime, Datelike, NaiveDate, TimeZone, Timelike, Utc};
 
     #[test]
