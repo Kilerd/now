@@ -1,5 +1,20 @@
-use chrono::{DateTime, Datelike, Duration, Month, NaiveDate, TimeZone, Timelike, Utc};
+use chrono::{DateTime, Datelike, Duration, Month, NaiveDate, TimeZone, Timelike, Utc, Weekday};
 use std::ops::{Add, Sub};
+
+#[derive(Debug)]
+pub enum WeekStartDay {
+    Monday,
+    Sunday,
+}
+
+impl WeekStartDay {
+    pub fn to_week_day(&self) -> Weekday {
+        match self {
+            WeekStartDay::Monday => Weekday::Mon,
+            WeekStartDay::Sunday => Weekday::Sun,
+        }
+    }
+}
 
 pub trait TimeZoneNow {
     type Timezone: TimeZone;
@@ -7,7 +22,14 @@ pub trait TimeZoneNow {
     fn beginning_of_minute(&self) -> DateTime<Self::Timezone>;
     fn beginning_of_hour(&self) -> DateTime<Self::Timezone>;
     fn beginning_of_day(&self) -> DateTime<Self::Timezone>;
+    /// get beginning of week. the default week start day is Monday.
     fn beginning_of_week(&self) -> DateTime<Self::Timezone>;
+    /// get beginning of week given specific week start day.
+    fn beginning_of_week_with_start_day(
+        &self,
+        week_start_day: &WeekStartDay,
+    ) -> DateTime<Self::Timezone>;
+
     fn beginning_of_month(&self) -> DateTime<Self::Timezone>;
     fn beginning_of_quarter(&self) -> DateTime<Self::Timezone>;
     fn beginning_of_year(&self) -> DateTime<Self::Timezone>;
@@ -15,7 +37,11 @@ pub trait TimeZoneNow {
     fn end_of_minute(&self) -> DateTime<Self::Timezone>;
     fn end_of_hour(&self) -> DateTime<Self::Timezone>;
     fn end_of_day(&self) -> DateTime<Self::Timezone>;
+    /// get end of week. the default week start day is Monday.
     fn end_of_week(&self) -> DateTime<Self::Timezone>;
+    /// get end of week given specific week start day.
+    fn end_of_week_with_start_day(&self, week_start_day: &WeekStartDay)
+        -> DateTime<Self::Timezone>;
     fn end_of_month(&self) -> DateTime<Self::Timezone>;
     fn end_of_quarter(&self) -> DateTime<Self::Timezone>;
     fn end_of_year(&self) -> DateTime<Self::Timezone>;
@@ -26,7 +52,14 @@ pub trait DateTimeNow {
     fn beginning_of_minute(&self) -> DateTime<Self::Timezone>;
     fn beginning_of_hour(&self) -> DateTime<Self::Timezone>;
     fn beginning_of_day(&self) -> DateTime<Self::Timezone>;
+    /// get beginning of week. the default week start day is Monday.
     fn beginning_of_week(&self) -> DateTime<Self::Timezone>;
+    /// get beginning of week given specific week start day.
+    fn beginning_of_week_with_start_day(
+        &self,
+        week_start_day: &WeekStartDay,
+    ) -> DateTime<Self::Timezone>;
+
     fn beginning_of_month(&self) -> DateTime<Self::Timezone>;
     fn beginning_of_quarter(&self) -> DateTime<Self::Timezone>;
     fn beginning_of_year(&self) -> DateTime<Self::Timezone>;
@@ -35,6 +68,8 @@ pub trait DateTimeNow {
     fn end_of_hour(&self) -> DateTime<Self::Timezone>;
     fn end_of_day(&self) -> DateTime<Self::Timezone>;
     fn end_of_week(&self) -> DateTime<Self::Timezone>;
+    fn end_of_week_with_start_day(&self, week_start_day: &WeekStartDay)
+        -> DateTime<Self::Timezone>;
     fn end_of_month(&self) -> DateTime<Self::Timezone>;
     fn end_of_quarter(&self) -> DateTime<Self::Timezone>;
     fn end_of_year(&self) -> DateTime<Self::Timezone>;
@@ -66,6 +101,15 @@ where
         Utc::now().with_timezone(self).beginning_of_week()
     }
 
+    fn beginning_of_week_with_start_day(
+        &self,
+        week_start_day: &WeekStartDay,
+    ) -> DateTime<Self::Timezone> {
+        Utc::now()
+            .with_timezone(self)
+            .beginning_of_week_with_start_day(week_start_day)
+    }
+
     fn beginning_of_month(&self) -> DateTime<Self::Timezone> {
         Utc::now().with_timezone(self).beginning_of_month()
     }
@@ -92,6 +136,15 @@ where
 
     fn end_of_week(&self) -> DateTime<Self::Timezone> {
         Utc::now().with_timezone(self).end_of_week()
+    }
+
+    fn end_of_week_with_start_day(
+        &self,
+        week_start_day: &WeekStartDay,
+    ) -> DateTime<Self::Timezone> {
+        Utc::now()
+            .with_timezone(self)
+            .end_of_week_with_start_day(week_start_day)
     }
 
     fn end_of_month(&self) -> DateTime<Self::Timezone> {
@@ -144,7 +197,17 @@ impl<T: TimeZone> DateTimeNow for DateTime<T> {
     }
 
     fn beginning_of_week(&self) -> DateTime<Self::Timezone> {
-        let prec_day = self.weekday().number_from_monday() - 1;
+        self.beginning_of_week_with_start_day(&WeekStartDay::Monday)
+    }
+
+    fn beginning_of_week_with_start_day(
+        &self,
+        week_start_day: &WeekStartDay,
+    ) -> DateTime<Self::Timezone> {
+        let prec_day = match week_start_day {
+            WeekStartDay::Monday => self.weekday().number_from_monday() - 1,
+            WeekStartDay::Sunday => self.weekday().num_days_from_sunday(),
+        };
         let time: DateTime<T> = self.clone().sub(Duration::days(prec_day as i64));
         let succ_local_date_time = time.naive_local();
         let time5 = NaiveDate::from_ymd(
@@ -220,7 +283,17 @@ impl<T: TimeZone> DateTimeNow for DateTime<T> {
     }
 
     fn end_of_week(&self) -> DateTime<Self::Timezone> {
-        let succ_day = 7 - self.weekday().number_from_monday();
+        self.end_of_week_with_start_day(&WeekStartDay::Monday)
+    }
+
+    fn end_of_week_with_start_day(
+        &self,
+        week_start_day: &WeekStartDay,
+    ) -> DateTime<Self::Timezone> {
+        let succ_day = match week_start_day {
+            WeekStartDay::Monday => 7 - self.weekday().number_from_monday(),
+            WeekStartDay::Sunday => 7 - self.weekday().number_from_sunday(),
+        };
         let time: DateTime<T> = self.clone().add(Duration::days(succ_day as i64));
         let succ_local_date_time = time.naive_local();
         let time5 = NaiveDate::from_ymd(
@@ -275,8 +348,8 @@ impl<T: TimeZone> DateTimeNow for DateTime<T> {
 
 #[cfg(test)]
 mod test {
-    use crate::DateTimeNow;
-    use chrono::{DateTime, Datelike, NaiveDate, TimeZone, Timelike, Utc};
+    use crate::{DateTimeNow, WeekStartDay};
+    use chrono::{DateTime, Datelike, NaiveDate, TimeZone, Timelike, Utc, Weekday};
 
     #[test]
     fn test_end_of_day() {
@@ -288,6 +361,50 @@ mod test {
         assert_eq!(23, x.hour());
         assert_eq!(59, x.minute());
         assert_eq!(59, x.second());
+    }
+
+    #[test]
+    fn test_beginning_of_week() {
+        let naive_date_time = NaiveDate::from_ymd(2021, 7, 21).and_hms(0, 0, 1);
+        let date_time: DateTime<Utc> = Utc.from_local_datetime(&naive_date_time).unwrap();
+
+        assert_eq!(Weekday::Mon, date_time.beginning_of_week().weekday());
+        assert_eq!(19, date_time.beginning_of_week().day());
+
+        assert_eq!(
+            Weekday::Sun,
+            date_time
+                .beginning_of_week_with_start_day(&WeekStartDay::Sunday)
+                .weekday()
+        );
+        assert_eq!(
+            18,
+            date_time
+                .beginning_of_week_with_start_day(&WeekStartDay::Sunday)
+                .day()
+        );
+    }
+
+    #[test]
+    fn test_end_of_week() {
+        let naive_date_time = NaiveDate::from_ymd(2021, 7, 21).and_hms(0, 0, 1);
+        let date_time: DateTime<Utc> = Utc.from_local_datetime(&naive_date_time).unwrap();
+
+        assert_eq!(Weekday::Sun, date_time.end_of_week().weekday());
+        assert_eq!(25, date_time.end_of_week().day());
+
+        assert_eq!(
+            Weekday::Sat,
+            date_time
+                .end_of_week_with_start_day(&WeekStartDay::Sunday)
+                .weekday()
+        );
+        assert_eq!(
+            24,
+            date_time
+                .end_of_week_with_start_day(&WeekStartDay::Sunday)
+                .day()
+        );
     }
 
     #[test]
