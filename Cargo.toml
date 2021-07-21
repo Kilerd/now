@@ -1,9 +1,9 @@
 [package]
 name = "now"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Kilerd <blove694@gmail.com>"]
 edition = "2018"
-description = "a human friendly time parse lib"
+description = "a time toolkit for chrono"
 license = "MIT"
 repository = "https://github.com/Kilerd/now"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -14,7 +14,7 @@ harness = false
 
 
 [dependencies]
-chrono = "0.4.19"
+chrono = "0.4"
 
 [dev-dependencies]
 criterion = "0.3"
