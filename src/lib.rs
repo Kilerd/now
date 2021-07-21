@@ -276,6 +276,7 @@ impl<T: TimeZone> DateTimeNow for DateTime<T> {
 #[cfg(test)]
 mod test {
     use chrono::Timelike;
+    use crate::TimeZoneNow;
 
     #[test]
     fn test_end_of_day() {
@@ -287,5 +288,30 @@ mod test {
         assert_eq!(23, x.hour());
         assert_eq!(59, x.minute());
         assert_eq!(59, x.second());
+    }
+
+    #[test]
+    fn test_all() {
+        use chrono::FixedOffset;
+
+        use crate::TimeZoneNow;
+        let offset = FixedOffset::east(60 * 60 * 8);
+
+        dbg!(offset.now());
+        dbg!(offset.beginning_of_minute());
+        dbg!(offset.beginning_of_hour());
+        dbg!(offset.beginning_of_day());
+        dbg!(offset.beginning_of_week());
+        dbg!(offset.beginning_of_month());
+        dbg!(offset.beginning_of_quarter());
+        dbg!(offset.beginning_of_year());
+
+        dbg!(offset.end_of_minute());
+        dbg!(offset.end_of_hour());
+        dbg!(offset.end_of_day());
+        dbg!(offset.end_of_week());
+        dbg!(offset.end_of_month());
+        dbg!(offset.end_of_quarter());
+        dbg!(offset.end_of_year());
     }
 }
