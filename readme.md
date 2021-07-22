@@ -29,7 +29,7 @@ cargo add now
 Trait `TimeZoneNow` provide convenient and human-readable method for `chrono::Timezone`:
 ```rust
 use chrono::FixedOffset;
-use crate::TimeZoneNow;
+use now::TimeZoneNow;
 
 let offset = FixedOffset::east(60 * 60 * 8);
 
@@ -54,7 +54,7 @@ offset.end_of_year();           // 2021-12-31T23:59:59.999999999+08:00
 
 And Trait `DateTimeNow` support those methods for `chrono:DateTime<T:Timezone>`:
 ```rust
-use crate::DateTimeNow;
+use now::DateTimeNow;
 
 let time = Utc::now();          // 2021-07-21T05:18:25.011480Z
 
