@@ -84,7 +84,7 @@ where
     type Timezone = T;
 
     fn now(&self) -> DateTime<Self::Timezone> {
-        Utc::now().with_timezone(&self)
+        Utc::now().with_timezone(self)
     }
 
     fn beginning_of_minute(&self) -> DateTime<Self::Timezone> {
