@@ -16,7 +16,7 @@ add dependency to `Cargo.toml`:
 ```toml
 # Cargo.toml
 [dependencies]
-now = "0.1.2"
+now = "0.1"
 ```
 
 or, you can use cargo-edit to add dependency via:
